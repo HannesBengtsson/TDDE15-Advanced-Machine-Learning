@@ -68,33 +68,19 @@ observations <- robot_simulation$observation
 ################ EXERCISE 3 ###############
 ###########################################
 
-# Calculation of alpha and beta values
-alpha <- exp(forward(robot, observations))
-beta <- exp(backward(robot, observations))
+# Calculating the filtered probability distributions using the forward function
+# Exp takes the logarithmic output from the forward function and convert them into natural numbers
+# Prob.table with margin 2 normalizes the filtered probability distributions for each time step
+# i.e., normalizes each column in the filtered matrix
+# Using prop.table returns the same result as when looping over all columns and taking each value 
+# in a column and divide it by the sum of all values in that column (col if margin = 2)
+filtered <- prop.table(exp(forward(robot, observations)),margin=2)
 
-# Functions for calculating the filtered probability distributions
-filtering <- function(alpha){
-  f <- matrix(nrow=dim(alpha)[1], ncol=dim(alpha)[2], 
-              dimnames = list(states,seq(from=1,to=100)))
-  for(i in 1:ncol(f)){
-    f[,i] <-  alpha[,i]/sum(alpha[,i])
-  }
-  return(prop.table(f, margin=2))
-}
-
-# Functions for calculating the smoothed probability distributions
-smoothing <- function(alpha,beta){
-  s <- matrix(nrow=dim(alpha)[1], ncol=dim(alpha)[2], 
-              dimnames = list(states,seq(from=1,to=100)))
-  for(i in 1:ncol(s)){
-    s[,i] <-  alpha[,i]*beta[,i]/sum(alpha[,i]*beta[,i])
-  }
-  return(prop.table(s, margin=2))
-}
-
-# Calculation of probabilities
-filtered <- filtering(alpha)
-smoothed <- smoothing(alpha,beta)
+# To compute the smoothed probability distributions we can use the posterior function
+# or we can combine the forward and backward functions, multiplying alpha and beta
+# from the forward function alpha is obtained and from backward beta is obtained
+smoothed <- posterior(robot,observations)
+smoothed <- prop.table(exp(forward(robot, observations))*exp(backward(robot,observations)),margin=2)
 
 # Most probable path using the Viterbi algorithm
 most_prob_path <- viterbi(robot, observations)
@@ -175,6 +161,6 @@ ggplot(data = data)+
 # If the trans_matrix contains NA instead of 0 we get NA in the matrix multiplication
 # Therefore we need to use 0 when initiating the trans_matrix for the HMM
 filtered[,100]
-smoothed[,100]
+smoothed[,100] # Same probability distribution as filtered since first beta is fixed
 prob_101 <- as.vector(filtered[,100] %*% trans_matrix)
 
