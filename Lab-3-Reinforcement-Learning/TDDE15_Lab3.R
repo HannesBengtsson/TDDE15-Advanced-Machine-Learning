@@ -7,8 +7,9 @@ library(ggplot2)
 ################ EXERCISE 1 ###############
 ###########################################
 
+# Up/right/down/left for (x,y) might seem counter intuitive but the axisis are 
+# opposite of what one might think
 # Q-learning
-
 arrows <- c("^", ">", "v", "<")
 action_deltas <- list(c(1,0), # up
                       c(0,1), # right
@@ -73,6 +74,15 @@ GreedyPolicy <- function(x, y){
   
   # Your code here.
   
+  # The action that maximize the expected reward in the given state
+  # i.e., locate x,y in our q_table and check which direction that gives the highest expected reward
+  exp_reward <- q_table[x,y,] # Save expected reward for possible actions at given state
+  max_value <- max(exp_reward) # Get the maximum expected reward
+  max_index <- which(exp_reward == max_value) # Get the positions in exp_reward that contains the max value
+  
+  # Sample the action/direction with the highest exp_reward at random if we have more than 1 max
+  ifelse(length(max_index) == 1, action <- max_index,action <- sample(x=c(max_index),size=1) )
+  return(action) # Return a greedy action
 }
 
 EpsilonGreedyPolicy <- function(x, y, epsilon){
@@ -88,6 +98,16 @@ EpsilonGreedyPolicy <- function(x, y, epsilon){
   
   # Your code here.
   
+  # Generates a random action
+  random_action <- sample(c(1,2,3,4),size=1)
+  # Extracts the action that maximize the expected return
+  greedy_action <- GreedyPolicy(x,y)
+  # Generate a random number between 0 and 1
+  random_number <- runif(1)
+  # Decision based on epsilon
+  # If the randomly generated number is less than or equal to epsilon we take a random action
+  # otherwise we take a greedy action
+  ifelse(random_number <= epsilon, return(random_action),return(greedy_action))
 }
 
 transition_model <- function(x, y, action, beta){
@@ -135,11 +155,27 @@ q_learning <- function(start_state, epsilon = 0.5, alpha = 0.1, gamma = 0.95,
   #   a global variable can be modified with the superassigment operator <<-.
   
   # Your code here.
-  
+  s <- start_state
+  episode_correction <- 0
   repeat{
     # Follow policy, execute action, get reward.
+    s.x <- s[1] # Save x coordinate for s
+    s.y <- s[2] # Save y coordinate for s
+    
+    action <- EpsilonGreedyPolicy(s.x,s.y,epsilon)
+    sp <- transition_model(s.x,s.y,action,beta)
+    reward <- reward_map[sp[1],sp[2]]
     
     # Q-table update.
+    sp.x <- sp[1] # Save x coordinate for s-prime
+    sp.y <- sp[2] # Save y coordinate for s-prime
+    sp.ga <- GreedyPolicy(sp.x,sp.y) # Get action that max reward for s-prime
+    sp.max_q <- q_table[sp.x,sp.y,sp.ga] # Get current reward for s-prime given greedy action
+    
+    correction <- alpha*(reward+gamma*sp.max_q-q_table[s.x,s.y,action])
+    q_table[s.x,s.y,action] <<- q_table[s.x,s.y,action] + correction # Update Q
+    episode_correction <- episode_correction + correction # Increase episode correction
+    s <- sp # Assign s to s-prime
     
     if(reward!=0)
       # End episode.
@@ -164,6 +200,7 @@ reward_map[2:4,3] <- -1
 q_table <- array(0,dim = c(H,W,4))
 
 vis_environment()
+
 
 for(i in 1:10000){
   foo <- q_learning(start_state = c(3,1))
