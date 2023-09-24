@@ -35,3 +35,15 @@ A summary of the lab is presented below, but for further details, please checkou
 **Exercise 6 – Assess knowledge gain over time:** Explored whether more observations led to better knowledge of the robot's location by calculating the entropy of the filtered distributions.
 
 **Exercise 7 – Predict hidden states beyond the observed data:** Predicted the probabilities of the hidden states for time step 101.
+
+#
+
+### [Lab 3](https://github.com/HannesBengtsson/TDDE15-Advanced-Machine-Learning/tree/main/Lab-3-Reinforcement-Learning) – Reinforcement Learning
+
+A summary of the lab is presented below, but for further details, please checkout my [lab report](https://github.com/HannesBengtsson/TDDE15-Advanced-Machine-Learning/blob/main/Lab-3-Reinforcement-Learning/Lab3_Notes.pdf), [implementation](https://github.com/HannesBengtsson/TDDE15-Advanced-Machine-Learning/blob/main/Lab-3-Reinforcement-Learning/TDDE15_Lab3.R), and the [lab instructions in full](https://github.com/HannesBengtsson/TDDE15-Advanced-Machine-Learning/blob/main/Lab-3-Reinforcement-Learning/Lab3_Description.pdf).
+
+**Exercise 1 – Q-Learning algorithm implementation:** Implemented Q-Learning in a grid-world environment. 
+
+**Exercise 2 – Q-Learning parameter analysis:** Explored Q-Learning's progress, policy optimality, and handling of multiple reward paths. Further I investigated how the ε, β, and γ parameters affected the learned policy. 
+
+**Exercise 3 – REINFORCE algorithm analysis:** Explored the REINFORCE algorithm within grid-world environments, focusing on the agent's ability to reach random goal positions. Evaluated the learned policies for various goal positions, both within and beyond the training set, to assess the algorithm's performance.
