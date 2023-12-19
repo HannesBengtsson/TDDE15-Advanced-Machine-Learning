@@ -1,13 +1,20 @@
+########################################
+### Lab 3 - Reinforcement Learning
+### By Hannes Bengtsson
+### TDDE15 - Advanced Machine Learning
+### Linköping University
+########################################
+
 # Install and import necessary packages
-# install.packages("ggplot2")
-# install.packages("vctrs")
+install.packages("ggplot2")
+install.packages("vctrs")
 library(ggplot2)
 
 ############################################
 ################ EXERCISE 1 ###############
 ###########################################
 
-# Up/right/down/left for (x,y) might seem counter intuitive but the axisis are 
+# Up/right/down/left for (x,y) might seem counter intuitive but the axis's are 
 # opposite of what one might think
 # Q-learning
 arrows <- c("^", ">", "v", "<")
@@ -82,7 +89,8 @@ GreedyPolicy <- function(x, y){
   
   # Sample the action/direction with the highest exp_reward at random if we have more than 1 max
   ifelse(length(max_index) == 1, action <- max_index,action <- sample(x=c(max_index),size=1) )
-  return(action) # Return a greedy action
+  
+  return(action) # Return a greedy action, integer in {1,2,3,4}
 }
 
 EpsilonGreedyPolicy <- function(x, y, epsilon){
@@ -100,14 +108,18 @@ EpsilonGreedyPolicy <- function(x, y, epsilon){
   
   # Generates a random action
   random_action <- sample(c(1,2,3,4),size=1)
+  
   # Extracts the action that maximize the expected return
   greedy_action <- GreedyPolicy(x,y)
-  # Generate a random number between 0 and 1
-  random_number <- runif(1)
+  
+  # Probability of greedy action, random number between 0 and 1 
+  greedy_prob <- runif(1)
+  
   # Decision based on epsilon
-  # If the randomly generated number is less than or equal to epsilon we take a random action
-  # otherwise we take a greedy action
-  ifelse(random_number <= epsilon, return(random_action),return(greedy_action))
+  # If the probability of a greedy action is less than epsilon 
+  # we take a random action otherwise we take a greedy action and return it
+  # Note that epsilon is the probability of acting randomly
+  ifelse(greedy_prob < epsilon, return(random_action),return(greedy_action))
 }
 
 transition_model <- function(x, y, action, beta){
@@ -158,6 +170,7 @@ q_learning <- function(start_state, epsilon = 0.5, alpha = 0.1, gamma = 0.95,
   s <- start_state
   episode_correction <- 0
   repeat{
+    
     # Follow policy, execute action, get reward.
     s.x <- s[1] # Save x coordinate for s
     s.y <- s[2] # Save y coordinate for s
